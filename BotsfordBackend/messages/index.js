@@ -5,6 +5,11 @@ const adapter = new BotFrameworkAdapter({
     appPassword: process.env.MicrosoftAppPassword,
 });
 
+adapter.onTurnError = async (context, error) => {
+    console.error('Error caught in onTurnError:', error);
+    await context.sendActivity('Oops! Something went wrong.');
+};
+
 class BotsfordBot extends ActivityHandler {
     constructor() {
         super();
@@ -19,7 +24,15 @@ class BotsfordBot extends ActivityHandler {
 const bot = new BotsfordBot();
 
 module.exports = async function (context, req) {
-    await adapter.processActivity(req, context.res, async (turnContext) => {
-        await bot.run(turnContext);
-    });
+    try {
+        await adapter.processActivity(req, context.res, async (turnContext) => {
+            await bot.run(turnContext);
+        });
+    } catch (err) {
+        console.error('Function error:', err);
+        context.res = {
+            status: 500,
+            body: 'Internal Server Error'
+        };
+    }
 };
