@@ -1,23 +1,25 @@
-const { app } = require('@azure/functions');
+const { BotFrameworkAdapter, ActivityHandler } = require('botbuilder');
 
-app.http('Messages', {
-  methods: ['POST'],
-  authLevel: 'anonymous',
-  handler: async (request, context) => {
-    context.log('Botsford backend received a message!');
-
-    const body = await request.json();
-    const userMessage = body?.text || body?.value || 'No text found';
-
-    context.log('Message:', userMessage);
-
-    return {
-      status: 200,
-      body: JSON.stringify({
-        type: 'message',
-        text: `Hello from Botsford 🤖! You said: "${userMessage}"`
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    };
-  }
+const adapter = new BotFrameworkAdapter({
+    appId: process.env.MicrosoftAppId,
+    appPassword: process.env.MicrosoftAppPassword,
 });
+
+class BotsfordBot extends ActivityHandler {
+    constructor() {
+        super();
+        this.onMessage(async (context, next) => {
+            const userMessage = context.activity.text || 'No message';
+            await context.sendActivity(`Hello from Botsford 🤖! You said: "${userMessage}"`);
+            await next();
+        });
+    }
+}
+
+const bot = new BotsfordBot();
+
+module.exports = async function (context, req) {
+    await adapter.processActivity(req, context.res, async (turnContext) => {
+        await bot.run(turnContext);
+    });
+};
