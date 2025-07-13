@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@azure/functions": "^4.7.2",
-    "botbuilder": "^4.17.0-blobs1"
+    "botbuilder": "^4.22.2"
   },
   "devDependencies": {
     "azure-functions-core-tools": "^4.x"
