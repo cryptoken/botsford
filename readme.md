@@ -1,1 +1,2 @@
-This is a sample
+Botsford is an Teams bot created with Azure Bot Service. 
+
