@@ -25,6 +25,12 @@ const bot = new BotsfordBot();
 
 module.exports = async function (context, req) {
     try {
+        // ✅ Diagnostics
+        console.log("AppId:", process.env.MicrosoftAppId);
+        console.log("Password set:", !!process.env.MicrosoftAppPassword);
+        console.log("Request headers:", req.headers);
+        console.log("Request body:", req.body);
+
         await adapter.processActivity(req, context.res, async (turnContext) => {
             await bot.run(turnContext);
         });
