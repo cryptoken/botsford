@@ -25,8 +25,9 @@ class BotsfordBot extends ActivityHandler {
     constructor() {
         super();
         this.onMessage(async (context, next) => {
-            const userMessage = context.activity.text || 'No message';
-            await context.sendActivity(`Hello from Botsford 🤖! You said: "${userMessage}"`);
+            // Reply with a hardcoded test message to confirm deployment.
+            await context.sendActivity('Hello from the new code!');
+            // By calling next() you ensure that the next BotHandler is run.
             await next();
         });
     }
