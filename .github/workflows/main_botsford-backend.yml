@@ -42,3 +42,4 @@ jobs:
           app-name: 'Botsford-Backend'
           slot-name: 'Production'
           package: '.'
+          enable-oryx-build: true
