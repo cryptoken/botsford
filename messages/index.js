@@ -3,16 +3,11 @@ const {
     BotFrameworkAdapter,
     ActivityHandler
 } = require('botbuilder');
+const jwt = require('jsonwebtoken');
 
-// Create the Bot Framework Authentication object.
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({
-    validateAuthority: true,
-    channelService: process.env.ChannelService, // Add ChannelService
-    MicrosoftAppId: process.env.MicrosoftAppId,
-    MicrosoftAppPassword: process.env.MicrosoftAppPassword,
-    MicrosoftAppTenantId: process.env.MicrosoftAppTenantId,
-    MicrosoftAppType: process.env.MicrosoftAppType
-});
+// Create bot framework authentication. The ConfigurationBotFrameworkAuthentication constructor
+// will automatically read the required environment variables.
+const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({});
 
 // Create adapter.
 const adapter = new BotFrameworkAdapter(botFrameworkAuthentication);
@@ -34,7 +29,17 @@ class BotsfordBot extends ActivityHandler {
 
 const bot = new BotsfordBot();
 
-module.exports = async (context, req) => {
+module.exports = async function (context, req) {
+    // DIAGNOSTIC: Log the critical authentication values to find the mismatch.
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.decode(token);
+        context.log(`DIAGNOSTIC - Token 'aud' claim: ${decoded.aud}`);
+        context.log(`DIAGNOSTIC - Environment 'MicrosoftAppId': ${process.env.MicrosoftAppId}`);
+    } catch (err) {
+        context.log('DIAGNOSTIC - Error decoding token:', err.message);
+    }
+
     try {
         // Diagnostics
         console.log("AppId:", process.env.MicrosoftAppId);
