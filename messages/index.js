@@ -1,10 +1,15 @@
-const { BotFrameworkAdapter, ActivityHandler } = require('botbuilder');
+const {
+    ConfigurationBotFrameworkAuthentication,
+    BotFrameworkAdapter,
+    ActivityHandler
+} = require('botbuilder');
 
-const adapter = new BotFrameworkAdapter({
-    appId: process.env.MicrosoftAppId,
-    appPassword: process.env.MicrosoftAppPassword,
-});
+// Create the Bot Framework Authentication object.
+// This will automatically read authentication information from environment variables.
+const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(process.env);
 
+// Create adapter.
+const adapter = new BotFrameworkAdapter(botFrameworkAuthentication);
 adapter.onTurnError = async (context, error) => {
     console.error('Error caught in onTurnError:', error);
     await context.sendActivity('Oops! Something went wrong.');
