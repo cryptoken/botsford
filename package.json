@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "botsford",
   "version": "1.0.0",
   "description": "",
   "main": "messages/index.js",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@azure/functions": "^4.7.2",
-    "botbuilder": "^4.22.2"
+    "botbuilder": "4.21.0"
   },
   "devDependencies": {
     "azure-functions-core-tools": "^4.x"

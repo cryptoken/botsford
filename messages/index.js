@@ -35,9 +35,9 @@ class BotsfordBot extends ActivityHandler {
 
 const bot = new BotsfordBot();
 
-module.exports = async function (context, req) {
+module.exports = async (context, req) => {
     try {
-        // ✅ Diagnostics
+        // Diagnostics
         console.log("AppId:", process.env.MicrosoftAppId);
         console.log("Password set:", !!process.env.MicrosoftAppPassword);
         console.log("Request headers:", req.headers);
