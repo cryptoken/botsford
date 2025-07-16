@@ -1,16 +1,21 @@
 const {
+    ConfigurationBotFrameworkAuthentication,
     BotFrameworkAdapter,
-    ActivityHandler,
-    SimpleCredentialProvider,
-    AuthenticationConfiguration
+    ActivityHandler
 } = require('botbuilder');
 
-// Create credential provider and authentication configuration.
-const credentialProvider = new SimpleCredentialProvider(process.env.MicrosoftAppId, process.env.MicrosoftAppPassword);
-const authConfig = new AuthenticationConfiguration();
+// Create the Bot Framework Authentication object.
+const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({
+    validateAuthority: true, // Critical for single-tenant
+    toBotFromChannelTokenIssuer: 'https://api.botframework.com',
+    MicrosoftAppId: process.env.MicrosoftAppId,
+    MicrosoftAppPassword: process.env.MicrosoftAppPassword,
+    MicrosoftAppTenantId: process.env.MicrosoftAppTenantId,
+    MicrosoftAppType: process.env.MicrosoftAppType
+});
 
 // Create adapter.
-const adapter = new BotFrameworkAdapter(credentialProvider, authConfig);
+const adapter = new BotFrameworkAdapter(botFrameworkAuthentication);
 adapter.onTurnError = async (context, error) => {
     console.error('Error caught in onTurnError:', error);
     await context.sendActivity('Oops! Something went wrong.');
