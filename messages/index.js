@@ -6,8 +6,9 @@ const {
 
 // Create the Bot Framework Authentication object.
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({
-    validateAuthority: true, // Critical for single-tenant
+    validateAuthority: true,
     toBotFromChannelTokenIssuer: 'https://api.botframework.com',
+    channelService: process.env.ChannelService, // Add ChannelService
     MicrosoftAppId: process.env.MicrosoftAppId,
     MicrosoftAppPassword: process.env.MicrosoftAppPassword,
     MicrosoftAppTenantId: process.env.MicrosoftAppTenantId,
