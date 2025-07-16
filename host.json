@@ -1,5 +1,6 @@
 {
   "version": "2.0",
+  "functions": [ "messages" ],
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
