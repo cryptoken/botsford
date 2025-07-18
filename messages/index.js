@@ -18,7 +18,7 @@ class MyBot extends ActivityHandler {
     constructor() {
         super();
         this.onMessage(async (context, next) => {
-            await context.sendActivity(`You said '${context.activity.text}'`);
+            await context.sendActivity(`This is the final test. You said: '${context.activity.text}'`);
             await next();
         });
 
