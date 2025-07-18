@@ -1,60 +1,43 @@
-const {
-    ConfigurationBotFrameworkAuthentication,
-    BotFrameworkAdapter,
-    ActivityHandler
-} = require('botbuilder');
-const jwt = require('jsonwebtoken');
+const { BotFrameworkAdapter, ConfigurationBotFrameworkAuthentication, ActivityHandler } = require('botbuilder');
 
-// Create bot framework authentication. The ConfigurationBotFrameworkAuthentication constructor
-// will automatically read the required environment variables.
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({});
+// Create the Bot Framework Authentication object.
+const auth = new ConfigurationBotFrameworkAuthentication(process.env);
 
 // Create adapter.
-const adapter = new BotFrameworkAdapter(botFrameworkAuthentication);
+const adapter = new BotFrameworkAdapter(auth);
+
+// Catch-all for errors.
 adapter.onTurnError = async (context, error) => {
-    console.error('Error caught in onTurnError:', error);
-    await context.sendActivity('Oops! Something went wrong.');
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    await context.sendTraceActivity('OnTurnError Trace', `${error}`, 'https://www.botframework.com/schemas/error', 'TurnError');
+    await context.sendActivity('The bot encountered an error or bug.');
 };
 
-class BotsfordBot extends ActivityHandler {
+// Create the main dialog.
+class MyBot extends ActivityHandler {
     constructor() {
         super();
         this.onMessage(async (context, next) => {
-            const userMessage = context.activity.text || 'No message';
-            await context.sendActivity(`Hello from Botsford 🤖! You said: "${userMessage}"`);
+            await context.sendActivity(`You said '${context.activity.text}'`);
+            await next();
+        });
+
+        this.onMembersAdded(async (context, next) => {
+            const membersAdded = context.activity.membersAdded;
+            for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
+                if (membersAdded[cnt].id !== context.activity.recipient.id) {
+                    await context.sendActivity('Hello and welcome!');
+                }
+            }
             await next();
         });
     }
 }
 
-const bot = new BotsfordBot();
+const bot = new MyBot();
 
-module.exports = async function (context, req) {
-    // DIAGNOSTIC: Log the critical authentication values to find the mismatch.
-    try {
-        const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.decode(token);
-        context.log(`DIAGNOSTIC - Token 'aud' claim: ${decoded.aud}`);
-        context.log(`DIAGNOSTIC - Environment 'MicrosoftAppId': ${process.env.MicrosoftAppId}`);
-    } catch (err) {
-        context.log('DIAGNOSTIC - Error decoding token:', err.message);
-    }
-
-    try {
-        // Diagnostics
-        console.log("AppId:", process.env.MicrosoftAppId);
-        console.log("Password set:", !!process.env.MicrosoftAppPassword);
-        console.log("Request headers:", req.headers);
-        console.log("Request body:", req.body);
-
-        await adapter.processActivity(req, context.res, async (turnContext) => {
-            await bot.run(turnContext);
-        });
-    } catch (err) {
-        console.error('Function error:', err);
-        context.res = {
-            status: 500,
-            body: 'Internal Server Error'
-        };
-    }
+// Azure Function entry point.
+module.exports = async (context, req) => {
+    // The adapter's process method now returns a promise, so we should await it.
+    await adapter.process(context, req, (context) => bot.run(context));
 };

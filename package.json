@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "@azure/functions": "^4.7.2",
-    "botbuilder": "4.21.0",
-    "jsonwebtoken": "^9.0.0"
+    "botbuilder": "4.21.0"
+
   },
   "devDependencies": {
     "azure-functions-core-tools": "^4.x"
