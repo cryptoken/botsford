@@ -1,9 +1,9 @@
 const { BotFrameworkAdapter, ConfigurationBotFrameworkAuthentication, ActivityHandler } = require('botbuilder');
 
-// Create the Bot Framework Authentication object.
+// Create the Bot Framework Authentication object
 const auth = new ConfigurationBotFrameworkAuthentication(process.env);
 
-// Create adapter.
+// Create adapter with authentication
 const adapter = new BotFrameworkAdapter(auth);
 
 // Catch-all for errors.
@@ -36,8 +36,8 @@ class MyBot extends ActivityHandler {
 
 const bot = new MyBot();
 
-// Azure Function entry point. (v2)
-module.exports = async (context, req) => {
-    // The adapter's process method now returns a promise, so we should await it.
+// Azure Function entry point
+module.exports = async function (context, req) {
+    // Process the request through the bot adapter
     await adapter.process(req, context.res, (context) => bot.run(context));
 };
