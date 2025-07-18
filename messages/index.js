@@ -36,7 +36,7 @@ class MyBot extends ActivityHandler {
 
 const bot = new MyBot();
 
-// Azure Function entry point.
+// Azure Function entry point. (v2)
 module.exports = async (context, req) => {
     // The adapter's process method now returns a promise, so we should await it.
     await adapter.process(req, context.res, (context) => bot.run(context));
