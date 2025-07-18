@@ -39,5 +39,5 @@ const bot = new MyBot();
 // Azure Function entry point.
 module.exports = async (context, req) => {
     // The adapter's process method now returns a promise, so we should await it.
-    await adapter.process(context, req, (context) => bot.run(context));
+    await adapter.process(req, context.res, (context) => bot.run(context));
 };
