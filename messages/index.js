@@ -5,6 +5,8 @@
 
 const { BotFrameworkAdapter, ActivityHandler } = require('botbuilder');
 
+console.log('Tenant at runtime →', process.env.MicrosoftAppTenantId);
+
 /*---------------------------------------------------------------
   1. Adapter configured with App ID, Secret, and Tenant override
 ----------------------------------------------------------------*/
