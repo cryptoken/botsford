@@ -1,20 +1,22 @@
 // messages/index.js
 // ===============================================================
-// Simple echo bot for Azure Functions using SECRET‑based auth
+// Echo bot for Azure Functions using App ID + Secret auth
 // ===============================================================
 
 const { BotFrameworkAdapter, ActivityHandler } = require('botbuilder');
 
 /*---------------------------------------------------------------
-  1. Adapter configured with App ID + App Password
+  1. Adapter configured with App ID, Secret, and Tenant override
 ----------------------------------------------------------------*/
 const adapter = new BotFrameworkAdapter({
   appId: process.env.MicrosoftAppId,
-  appPassword: process.env.MicrosoftAppPassword
+  appPassword: process.env.MicrosoftAppPassword,
+  // ✨ This line fixes AADSTS700016 by pointing to the right tenant
+  channelAuthTenant: process.env.MicrosoftAppTenantId
 });
 
 /*---------------------------------------------------------------
-  2. Robust global error handler
+  2. Global error handler
 ----------------------------------------------------------------*/
 adapter.onTurnError = async (context, error) => {
   console.error('[onTurnError] unhandled error:', error);
@@ -28,7 +30,7 @@ adapter.onTurnError = async (context, error) => {
 };
 
 /*---------------------------------------------------------------
-  3. Minimal ActivityHandler implementation
+  3. Minimal ActivityHandler
 ----------------------------------------------------------------*/
 class MyBot extends ActivityHandler {
   constructor() {
@@ -55,7 +57,7 @@ class MyBot extends ActivityHandler {
 const bot = new MyBot();
 
 /*---------------------------------------------------------------
-  4. Azure Function entry point
+  4. Azure Function entry point
 ----------------------------------------------------------------*/
 module.exports = async function (context, req) {
   console.log('🔔 Function triggered');
