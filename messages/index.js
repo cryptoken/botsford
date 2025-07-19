@@ -1,64 +1,70 @@
-const { BotFrameworkAdapter, ConfigurationBotFrameworkAuthentication, ActivityHandler } = require('botbuilder');
+// messages/index.js
+// ===============================================================
+// Simple echo bot for Azure Functions using SECRET‑based auth
+// ===============================================================
 
-// Create the Bot Framework Authentication object with enhanced logging
-const auth = new ConfigurationBotFrameworkAuthentication(process.env);
+const { BotFrameworkAdapter, ActivityHandler } = require('botbuilder');
 
-// Log the configuration being used
-console.log('Bot Authentication Configuration:');
-console.log('MicrosoftAppId:', process.env.MicrosoftAppId);
-console.log('MicrosoftAppPassword exists:', !!process.env.MicrosoftAppPassword);
-console.log('MicrosoftAppTenantId:', process.env.MicrosoftAppTenantId);
-console.log('MicrosoftAppType:', process.env.MicrosoftAppType);
+/*---------------------------------------------------------------
+  1. Adapter configured with App ID + App Password
+----------------------------------------------------------------*/
+const adapter = new BotFrameworkAdapter({
+  appId: process.env.MicrosoftAppId,
+  appPassword: process.env.MicrosoftAppPassword
+});
 
-// Create adapter with authentication
-const adapter = new BotFrameworkAdapter(auth);
-
-// Catch-all for errors.
+/*---------------------------------------------------------------
+  2. Robust global error handler
+----------------------------------------------------------------*/
 adapter.onTurnError = async (context, error) => {
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
-    console.error(`Error stack: ${error.stack}`);
-    console.error(`Context activity: ${JSON.stringify(context.activity, null, 2)}`);
-    await context.sendTraceActivity('OnTurnError Trace', `${error}`, 'https://www.botframework.com/schemas/error', 'TurnError');
-    await context.sendActivity('The bot encountered an error or bug.');
+  console.error('[onTurnError] unhandled error:', error);
+  await context.sendTraceActivity(
+    'OnTurnError Trace',
+    error.toString(),
+    'https://www.botframework.com/schemas/error',
+    'TurnError'
+  );
+  await context.sendActivity('🚨 The bot ran into a problem.');
 };
 
-// Create the main dialog.
+/*---------------------------------------------------------------
+  3. Minimal ActivityHandler implementation
+----------------------------------------------------------------*/
 class MyBot extends ActivityHandler {
-    constructor() {
-        super();
-        this.onMessage(async (context, next) => {
-            await context.sendActivity(`This is the final test. You said: '${context.activity.text}'`);
-            await next();
-        });
+  constructor() {
+    super();
 
-        this.onMembersAdded(async (context, next) => {
-            const membersAdded = context.activity.membersAdded;
-            for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
-                if (membersAdded[cnt].id !== context.activity.recipient.id) {
-                    await context.sendActivity('Hello and welcome!');
-                }
-            }
-            await next();
-        });
-    }
+    this.onMessage(async (context, next) => {
+      await context.sendActivity(
+        `This is the final test 🧪. You said: “${context.activity.text}”`
+      );
+      await next();
+    });
+
+    this.onMembersAdded(async (context, next) => {
+      for (const member of context.activity.membersAdded) {
+        if (member.id !== context.activity.recipient.id) {
+          await context.sendActivity('Hello and welcome! 👋');
+        }
+      }
+      await next();
+    });
+  }
 }
 
 const bot = new MyBot();
 
-// Azure Function entry point
+/*---------------------------------------------------------------
+  4. Azure Function entry point
+----------------------------------------------------------------*/
 module.exports = async function (context, req) {
-    console.log('Function triggered - Request received');
-    console.log(`Request method: ${req.method}`);
-    console.log(`Request headers: ${JSON.stringify(req.headers, null, 2)}`);
-    console.log(`Request body: ${JSON.stringify(req.body, null, 2)}`);
-    
-    try {
-        // Process the request through the bot adapter
-        await adapter.process(req, context.res, (context) => bot.run(context));
-        console.log('Bot processing completed successfully');
-    } catch (error) {
-        console.error(`Function error: ${error}`);
-        console.error(`Function error stack: ${error.stack}`);
-        throw error;
-    }
+  console.log('🔔 Function triggered');
+  try {
+    await adapter.process(req, context.res, (turnContext) =>
+      bot.run(turnContext)
+    );
+  } catch (err) {
+    console.error('[Function error]', err);
+    throw err;
+  }
 };
