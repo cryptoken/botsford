@@ -1,10 +1,7 @@
 const { BotFrameworkAdapter, ConfigurationBotFrameworkAuthentication, ActivityHandler } = require('botbuilder');
 
-// Create the Bot Framework Authentication object
-const auth = new ConfigurationBotFrameworkAuthentication(process.env);
-
-// Create adapter with authentication
-const adapter = new BotFrameworkAdapter(auth);
+// Temporarily disable authentication for testing
+const adapter = new BotFrameworkAdapter();
 
 // Catch-all for errors.
 adapter.onTurnError = async (context, error) => {
