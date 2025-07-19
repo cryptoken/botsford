@@ -1,7 +1,17 @@
 const { BotFrameworkAdapter, ConfigurationBotFrameworkAuthentication, ActivityHandler } = require('botbuilder');
 
-// Temporarily disable authentication for testing
-const adapter = new BotFrameworkAdapter();
+// Create the Bot Framework Authentication object with enhanced logging
+const auth = new ConfigurationBotFrameworkAuthentication(process.env);
+
+// Log the configuration being used
+console.log('Bot Authentication Configuration:');
+console.log('MicrosoftAppId:', process.env.MicrosoftAppId);
+console.log('MicrosoftAppPassword exists:', !!process.env.MicrosoftAppPassword);
+console.log('MicrosoftAppTenantId:', process.env.MicrosoftAppTenantId);
+console.log('MicrosoftAppType:', process.env.MicrosoftAppType);
+
+// Create adapter with authentication
+const adapter = new BotFrameworkAdapter(auth);
 
 // Catch-all for errors.
 adapter.onTurnError = async (context, error) => {
