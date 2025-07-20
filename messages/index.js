@@ -3,6 +3,7 @@
 // Echo bot for Azure Functions using App ID + Secret auth
 // ===============================================================
 
+// ✨ Botframework Adapter utilizes secrets
 const { BotFrameworkAdapter, ActivityHandler } = require('botbuilder');
 
 console.log('Tenant at runtime →', process.env.MicrosoftAppTenantId);
